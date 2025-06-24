@@ -1,1 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Phrase Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-btn.active {
+            background: #48bb78;
+            color: white;
+        }
+
+        .category-selector {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .category-btn {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            min-height: 400px;
+        }
+
+        .phrase-card {
+            text-align: center;
+            padding: 30px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            margin-bottom: 20px;
+            border-left: 5px solid #4299e1;
+        }
+
+        .english-phrase {
+            font-size: 1.4em;
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .spanish-phrase {
+            font-size: 1.8em;
+            color: #c53030;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .pronunciation {
+            font-size: 1.2em;
+            color: #718096;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-area {
+            display: none;
+        }
+
+        .quiz-area.active {
+            display: block;
+        }
+
+        .quiz-question {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #2d3748;
+            text-align: center;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .quiz-option:hover {
+            border-color: #4299e1;
+            background: #ebf8ff;
+        }
+
+        .quiz-option.correct {
+            background: #c6f6d5;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.incorrect {
+            background: #fed7d7;
+            border-color: #f56565;
+        }
+
+        .score {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #48bb78, #38a169);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .spanish-phrase {
+                font-size: 1.5em;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇪🇸 Spanish Phrase Trainer</h1>
+            <p>Master essential Spanish phrases for your traveling adventures!</p>
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('learn')">📚 Learn Mode</button>
+            <button class="mode-btn" onclick="setMode('quiz')">🧠 Quiz Mode</button>
+            <button class="mode-btn" onclick="setMode('review')">📖 Review Mode</button>
+        </div>
+
+        <div class="category-selector">
+            <h3>Choose a Category:</h3>
+            <div class="category-grid">
+                <button class="category-btn active" onclick="setCategory('greetings')">👋 Greetings</button>
+                <button class="category-btn" onclick="setCategory('travel')">✈️ Travel</button>
+                <button class="category-btn" onclick="setCategory('food')">🍽️ Food & Dining</button>
+                <button class="category-btn" onclick="setCategory('directions')">🗺️ Directions</button>
+                <button class="category-btn" onclick="setCategory('shopping')">🛍️ Shopping</button>
+                <button class="category-btn" onclick="setCategory('emergency')">🚨 Emergency</button>
+            </div>
+        </div>
+
+        <div class="training-area">
+            <div id="learn-mode" class="learn-area">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <div class="phrase-card" id="phrase-card">
+                    <div class="english-phrase" id="english-text">Hello, how are you?</div>
+                    <div class="spanish-phrase" id="spanish-text">Hola, ¿cómo está?</div>
+                    <div class="pronunciation" id="pronunciation-text">[OH-lah, KOH-moh ehs-TAH]</div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" onclick="previousPhrase()">⬅️ Previous</button>
+                    <button class="control-btn" onclick="toggleReveal()">👁️ Show/Hide</button>
+                    <button class="control-btn" onclick="nextPhrase()">Next ➡️</button>
+                    <button class="control-btn" onclick="playAudio()">🔊 Listen</button>
+                </div>
+            </div>
+
+            <div id="quiz-mode" class="quiz-area">
+                <div class="score" id="quiz-score">Score: 0/0</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quiz-progress"></div>
+                </div>
+                <div class="quiz-question" id="quiz-question">What does "Hola" mean?</div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <div class="controls">
+                    <button class="control-btn" onclick="nextQuiz()" id="next-quiz-btn" style="display:none;">Next Question</button>
+                    <button class="control-btn" onclick="restartQuiz()">Restart Quiz</button>
+                </div>
+            </div>
+
+            <div id="review-mode" class="quiz-area">
+                <div class="phrase-card">
+                    <h3 style="margin-bottom: 20px; color: #4a5568;">📋 Quick Reference Guide</h3>
+                    <div id="review-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const phrases = {
+            greetings: [
+                { english: "Hello", spanish: "Hola", pronunciation: "[OH-lah]" },
+                { english: "Good morning", spanish: "Buenos días", pronunciation: "[BWAY-nohs DEE-ahs]" },
+                { english: "Good afternoon", spanish: "Buenas tardes", pronunciation: "[BWAY-nahs TAR-dehs]" },
+                { english: "Good evening", spanish: "Buenas noches", pronunciation: "[BWAY-nahs NOH-chehs]" },
+                { english: "How are you?", spanish: "¿Cómo está?", pronunciation: "[KOH-moh ehs-TAH]" },
+                { english: "Nice to meet you", spanish: "Mucho gusto", pronunciation: "[MOO-choh GOOS-toh]" },
+                { english: "Please", spanish: "Por favor", pronunciation: "[por fah-VOR]" },
+                { english: "Thank you", spanish: "Gracias", pronunciation: "[GRAH-see-ahs]" },
+                { english: "You're welcome", spanish: "De nada", pronunciation: "[deh NAH-dah]" },
+                { english: "Excuse me", spanish: "Disculpe", pronunciation: "[dees-KOOL-peh]" }
+            ],
+            travel: [
+                { english: "Where is the airport?", spanish: "¿Dónde está el aeropuerto?", pronunciation: "[DOHN-deh ehs-TAH el ah-eh-roh-PWER-toh]" },
+                { english: "I need a taxi", spanish: "Necesito un taxi", pronunciation: "[neh-seh-SEE-toh oon TAHK-see]" },
+                { english: "How much does it cost?", spanish: "¿Cuánto cuesta?", pronunciation: "[KWAN-toh KWES-tah]" },
+                { english: "Where is my hotel?", spanish: "¿Dónde está mi hotel?", pronunciation: "[DOHN-deh ehs-TAH mee oh-TEHL]" },
+                { english: "I have a reservation", spanish: "Tengo una reserva", pronunciation: "[TEN-goh OO-nah reh-SER-vah]" },
+                { english: "Can you help me?", spanish: "¿Puede ayudarme?", pronunciation: "[PWEH-deh ah-yoo-DAR-meh]" },
+                { english: "I don't understand", spanish: "No entiendo", pronunciation: "[noh en-tee-EN-doh]" },
+                { english: "Do you speak English?", spanish: "¿Habla inglés?", pronunciation: "[AH-blah een-GLEYS]" },
+                { english: "Where is the bathroom?", spanish: "¿Dónde está el baño?", pronunciation: "[DOHN-deh ehs-TAH el BAH-nyoh]" },
+                { english: "I'm lost", spanish: "Estoy perdido", pronunciation: "[ehs-TOY per-DEE-doh]" }
+            ],
+            food: [
+                { english: "I'm hungry", spanish: "Tengo hambre", pronunciation: "[TEN-goh AHM-breh]" },
+                { english: "I'm thirsty", spanish: "Tengo sed", pronunciation: "[TEN-goh sed]" },
+                { english: "The menu, please", spanish: "La carta, por favor", pronunciation: "[lah KAR-tah, por fah-VOR]" },
+                { english: "I would like...", spanish: "Me gustaría...", pronunciation: "[meh goos-tah-REE-ah]" },
+                { english: "Water", spanish: "Agua", pronunciation: "[AH-gwah]" },
+                { english: "Beer", spanish: "Cerveza", pronunciation: "[ser-VEH-sah]" },
+                { english: "Coffee", spanish: "Café", pronunciation: "[kah-FEH]" },
+                { english: "The check, please", spanish: "La cuenta, por favor", pronunciation: "[lah KWEN-tah, por fah-VOR]" },
+                { english: "It's delicious", spanish: "Está delicioso", pronunciation: "[ehs-TAH deh-lee-see-OH-soh]" },
+                { english: "I'm vegetarian", spanish: "Soy vegetariano", pronunciation: "[soy veh-heh-tah-ree-AH-noh]" }
+            ],
+            directions: [
+                { english: "Where is...?", spanish: "¿Dónde está...?", pronunciation: "[DOHN-deh ehs-TAH]" },
+                { english: "Turn left", spanish: "Doble a la izquierda", pronunciation: "[DOH-bleh ah lah ees-kee-ER-dah]" },
+                { english: "Turn right", spanish: "Doble a la derecha", pronunciation: "[DOH-bleh ah lah deh-REH-chah]" },
+                { english: "Go straight", spanish: "Siga derecho", pronunciation: "[SEE-gah deh-REH-choh]" },
+                { english: "It's far", spanish: "Está lejos", pronunciation: "[ehs-TAH LEH-hohs]" },
+                { english: "It's near", spanish: "Está cerca", pronunciation: "[ehs-TAH SER-kah]" },
+                { english: "North", spanish: "Norte", pronunciation: "[NOR-teh]" },
+                { english: "South", spanish: "Sur", pronunciation: "[soor]" },
+                { english: "East", spanish: "Este", pronunciation: "[EHS-teh]" },
+                { english: "West", spanish: "Oeste", pronunciation: "[oh-EHS-teh]" }
+            ],
+            shopping: [
+                { english: "How much is this?", spanish: "¿Cuánto cuesta esto?", pronunciation: "[KWAN-toh KWES-tah EHS-toh]" },
+                { english: "It's too expensive", spanish: "Es muy caro", pronunciation: "[es moo-ee KAH-roh]" },
+                { english: "Do you have...?", spanish: "¿Tiene...?", pronunciation: "[tee-EH-neh]" },
+                { english: "I'm just looking", spanish: "Solo estoy mirando", pronunciation: "[SOH-loh ehs-TOY mee-RAHN-doh]" },
+                { english: "Can I try it on?", spanish: "¿Puedo probármelo?", pronunciation: "[PWEH-doh proh-BAR-meh-loh]" },
+                { english: "What size?", spanish: "¿Qué talla?", pronunciation: "[keh TAH-yah]" },
+                { english: "I'll take it", spanish: "Me lo llevo", pronunciation: "[meh loh YEH-voh]" },
+                { english: "Do you accept credit cards?", spanish: "¿Aceptan tarjetas de crédito?", pronunciation: "[ah-SEP-tahn tar-HEH-tahs deh KREH-dee-toh]" },
+                { english: "Where is the market?", spanish: "¿Dónde está el mercado?", pronunciation: "[DOHN-deh ehs-TAH el mer-KAH-doh]" },
+                { english: "Is there a discount?", spanish: "¿Hay descuento?", pronunciation: "[ah-ee dehs-KWEN-toh]" }
+            ],
+            emergency: [
+                { english: "Help!", spanish: "¡Ayuda!", pronunciation: "[ah-YOO-dah]" },
+                { english: "Call the police", spanish: "Llame a la policía", pronunciation: "[YAH-meh ah lah poh-lee-SEE-ah]" },
+                { english: "Call an ambulance", spanish: "Llame una ambulancia", pronunciation: "[YAH-meh OO-nah ahm-boo-LAHN-see-ah]" },
+                { english: "I need a doctor", spanish: "Necesito un médico", pronunciation: "[neh-seh-SEE-toh oon MEH-dee-koh]" },
+                { english: "Where is the hospital?", spanish: "¿Dónde está el hospital?", pronunciation: "[DOHN-deh ehs-TAH el ohs-pee-TAHL]" },
+                { english: "I'm sick", spanish: "Estoy enfermo", pronunciation: "[ehs-TOY en-FER-moh]" },
+                { english: "I lost my passport", spanish: "Perdí mi pasaporte", pronunciation: "[per-DEE mee pah-sah-POR-teh]" },
+                { english: "I need help", spanish: "Necesito ayuda", pronunciation: "[neh-seh-SEE-toh ah-YOO-dah]" },
+                { english: "It's an emergency", spanish: "Es una emergencia", pronunciation: "[es OO-nah eh-mer-HEN-see-ah]" },
+                { english: "Call my embassy", spanish: "Llame a mi embajada", pronunciation: "[YAH-meh ah mee em-bah-HAH-dah]" }
+            ]
+        };
+
+        let currentMode = 'learn';
+        let currentCategory = 'greetings';
+        let currentPhrase = 0;
+        let showSpanish = true;
+        let quizScore = 0;
+        let quizQuestions = 0;
+        let currentQuiz = 0;
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.learn-area, .quiz-area').forEach(area => area.style.display = 'none');
+            
+            if (mode === 'learn') {
+                document.getElementById('learn-mode').style.display = 'block';
+                updatePhrase();
+            } else if (mode === 'quiz') {
+                document.getElementById('quiz-mode').style.display = 'block';
+                startQuiz();
+            } else if (mode === 'review') {
+                document.getElementById('review-mode').style.display = 'block';
+                showReview();
+            }
+        }
+
+        function setCategory(category) {
+            currentCategory = category;
+            currentPhrase = 0;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (currentMode === 'learn') {
+                updatePhrase();
+            } else if (currentMode === 'quiz') {
+                startQuiz();
+            } else if (currentMode === 'review') {
+                showReview();
+            }
+        }
+
+        function updatePhrase() {
+            const phrase = phrases[currentCategory][currentPhrase];
+            document.getElementById('english-text').textContent = phrase.english;
+            document.getElementById('spanish-text').textContent = showSpanish ? phrase.spanish : '???';
+            document.getElementById('pronunciation-text').textContent = showSpanish ? phrase.pronunciation : '';
+            
+            const progress = ((currentPhrase + 1) / phrases[currentCategory].length) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+        }
+
+        function nextPhrase() {
+            currentPhrase = (currentPhrase + 1) % phrases[currentCategory].length;
+            showSpanish = true;
+            updatePhrase();
+        }
+
+        function previousPhrase() {
+            currentPhrase = currentPhrase === 0 ? phrases[currentCategory].length - 1 : currentPhrase - 1;
+            showSpanish = true;
+            updatePhrase();
+        }
+
+        function toggleReveal() {
+            showSpanish = !showSpanish;
+            updatePhrase();
+        }
+
+        function playAudio() {
+            const phrase = phrases[currentCategory][currentPhrase];
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(phrase.spanish);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Audio not supported in this browser');
+            }
+        }
+
+        function startQuiz() {
+            quizScore = 0;
+            quizQuestions = 0;
+            currentQuiz = 0;
+            nextQuiz();
+        }
+
+        function nextQuiz() {
+            if (currentQuiz >= phrases[currentCategory].length) {
+                showQuizResults();
+                return;
+            }
+
+            const phrase = phrases[currentCategory][currentQuiz];
+            const allPhrases = phrases[currentCategory];
+            
+            // Create wrong answers
+            const wrongAnswers = allPhrases
+                .filter(p => p !== phrase)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3)
+                .map(p => p.spanish);
+
+            const options = [phrase.spanish, ...wrongAnswers].sort(() => Math.random() - 0.5);
+
+            document.getElementById('quiz-question').textContent = `What is "${phrase.english}" in Spanish?`;
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.textContent = option;
+                btn.onclick = () => selectQuizAnswer(option, phrase.spanish);
+                optionsContainer.appendChild(btn);
+            });
+
+            const progress = (currentQuiz / phrases[currentCategory].length) * 100;
+            document.getElementById('quiz-progress').style.width = progress + '%';
+            document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${quizQuestions}`;
+            document.getElementById('next-quiz-btn').style.display = 'none';
+        }
+
+        function selectQuizAnswer(selected, correct) {
+            quizQuestions++;
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach(option => {
+                option.onclick = null;
+                if (option.textContent === correct) {
+                    option.classList.add('correct');
+                } else if (option.textContent === selected && selected !== correct) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            if (selected === correct) {
+                quizScore++;
+            }
+
+            currentQuiz++;
+            document.getElementById('quiz-score').textContent = `Score: ${quizScore}/${quizQuestions}`;
+            document.getElementById('next-quiz-btn').style.display = 'inline-block';
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizScore / quizQuestions) * 100);
+            document.getElementById('quiz-question').innerHTML = `
+                <h3>Quiz Complete! 🎉</h3>
+                <p>Final Score: ${quizScore}/${quizQuestions} (${percentage}%)</p>
+                <p>${percentage >= 80 ? '¡Excelente! Great job!' : percentage >= 60 ? '¡Bien! Good work!' : 'Keep practicing!'}</p>
+            `;
+            document.getElementById('quiz-options').innerHTML = '';
+            document.getElementById('next-quiz-btn').style.display = 'none';
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        function showReview() {
+            const reviewContent = document.getElementById('review-content');
+            let html = '';
+            
+            phrases[currentCategory].forEach(phrase => {
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <strong>${phrase.english}</strong><br>
+                            <span style="color: #c53030; font-size: 1.1em;">${phrase.spanish}</span><br>
+                            <small style="color: #718096;">${phrase.pronunciation}</small>
+                        </div>
+                        <button onclick="speakPhrase('${phrase.spanish}')" style="background: #4299e1; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer;">🔊</button>
+                    </div>
+                `;
+            });
+            
+            reviewContent.innerHTML = html;
+        }
+
+        function speakPhrase(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Initialize the app
+        updatePhrase();
+    </script>
+</body>
+</html>
